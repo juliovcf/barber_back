@@ -25,5 +25,7 @@ public class BarberTreatment {
     private String description;
 
     private Double price;
+
+    private Integer duration;
     
 }

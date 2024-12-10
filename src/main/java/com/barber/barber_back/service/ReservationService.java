@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.barber.barber_back.model.BarberTreatment;
 import com.barber.barber_back.model.Client;
 import com.barber.barber_back.model.Reservation;
 import com.barber.barber_back.model.ReservationStatus;
+import com.barber.barber_back.repository.BarberTreatmentRepository;
 import com.barber.barber_back.repository.ClientRepository;
 import com.barber.barber_back.repository.ReservationRepository;
 
@@ -19,19 +21,27 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final ClientRepository clientRepository;
+    private final BarberTreatmentRepository barberTreatmentRepository;
 
-    public Reservation create(Reservation reserva) {
-        if (reserva.getClient() == null || reserva.getClient().getId() == null) {
-            throw new RuntimeException("Debe especificar un client existente para crear la reserva.");
-        }
-        // Verificar que el client existe
-        Client client = clientRepository.findById(reserva.getClient().getId())
-                .orElseThrow(() -> new RuntimeException("client no encontrado"));
-        
-        reserva.setClient(client);
-        reserva.setStatus(ReservationStatus.CONFIRMED);
-        
-        return reservationRepository.save(reserva);
+    public Reservation create(Reservation reservation) {
+        // Verificar si el cliente existe
+        Client client = clientRepository.findById(reservation.getClient().getId())
+                .orElseGet(() -> {
+                    // Crear el cliente automáticamente si no existe
+                    Client newClient = reservation.getClient();
+                    return clientRepository.save(newClient);
+                });
+
+        // Verificar si el tratamiento existe
+        BarberTreatment barberTreatment = barberTreatmentRepository.findById(reservation.getBarberTreatment().getId())
+                .orElseThrow(() -> new RuntimeException("BarberTreatment not found"));
+
+        // Asociar el cliente y el tratamiento a la reserva
+        reservation.setClient(client);
+        reservation.setBarberTreatment(barberTreatment);
+
+        // Guardar la reserva
+        return reservationRepository.save(reservation);
     }
 
     public Reservation update(Long id, Reservation nuevosDatos) {
