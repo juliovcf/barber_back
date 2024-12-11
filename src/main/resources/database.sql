@@ -16,3 +16,7 @@ INSERT INTO barber_treatment (name, description, price) VALUES
 ('Peinado', 'Peinado para eventos o estilo diario.', 18.00),
 ('Alisado de Cabello', 'Alisado profesional con productos especializados.', 50.00),
 ('Tratamiento Capilar', 'Hidratación y reparación profunda del cabello.', 30.00);
+
+INSERT INTO user (username, password, role) VALUES
+('admin', 'adminpass', 'ADMIN'),
+('user', 'userpass', 'USER');
